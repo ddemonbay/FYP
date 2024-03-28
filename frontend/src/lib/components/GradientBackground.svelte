@@ -1,0 +1,233 @@
+<script>
+  export let theme;
+
+  let transformStyle;
+  let curX = 0;
+  let curY = 0;
+  let tgX = 0;
+  let tgY = 0;
+
+  function move() {
+    curX += (tgX - curX) / 20;
+    curY += (tgY - curY) / 20;
+    transformStyle = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+
+    requestAnimationFrame(() => {
+      move();
+    });
+  }
+
+  window.addEventListener('mousemove', (event) => {
+    tgX = event.clientX;
+    tgY = event.clientY;
+  });
+
+  move();
+</script>
+
+<div class="gradient-bg">
+  <svg xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+        <feBlend in="SourceGraphic" in2="goo" />
+      </filter>
+    </defs>
+  </svg>
+  <div class="gradients-container" class:dark={theme=="dark"}>
+    <div class="g1"></div>
+    <div class="g2"></div>
+    <div class="g3"></div>
+    <div class="g4"></div>
+    <div class="g5"></div>
+    <div style:transform={transformStyle} class="interactive"></div>
+  </div>
+</div>
+
+<style lang="scss">
+  $color-bg-1: rgb(156, 83, 245); // rgb(176, 133, 229) lighter version
+  $color-bg-2: rgb(179, 72, 206); // rgb(229, 155, 169)
+  $color-bg-3: rgb(36, 174, 212); // rgb(117, 232, 59)
+  $color-dark-bg-1: rgb(122, 23, 244); // rgb(176, 133, 229) lighter version
+  $color-dark-bg-2: rgb(187, 41, 223); // rgb(229, 155, 169)
+  $color-dark-bg-3: rgb(13, 139, 174); // rgb(117, 232, 59)
+
+  
+  $color1: #18f0de;
+  $color2: #e26077;
+  $color3: #64dcff;
+  $color4: #fe7272;
+  $color5: #d2ec51;
+  $color-interactive: #8c4fd6;
+  $color-dark-interactive: #43007d;
+  $circle-size-small: 75%;
+  $circle-size-medium: 80%;
+  $circle-size-large: 85%;
+  $circle-size-interactive: 140%;
+  $inner-circle-opacity: .8;
+  $circle-opacity: 1;
+  $blending: hard-light;
+
+  @keyframes moveInCircle {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes moveVertical {
+    0% {
+      transform: translateY(-50%);
+    }
+    50% {
+      transform: translateY(50%);
+    }
+    100% {
+      transform: translateY(-50%);
+    }
+  }
+
+  @keyframes moveHorizontal {
+    0% {
+      transform: translateX(-50%) translateY(-10%);
+    }
+    50% {
+      transform: translateX(50%) translateY(10%);
+    }
+    100% {
+      transform: translateX(-50%) translateY(-10%);
+    }
+  }
+
+  .dark.gradients-container {
+    background: linear-gradient(217deg, $color-dark-bg-1, rgba(0,0,0,0)),
+      linear-gradient(127deg, $color-dark-bg-2, rgba(0,0,0,0)),
+      linear-gradient(316deg, $color-dark-bg-3, rgba(0,0,0,0));
+
+    .interactive {
+      background: radial-gradient(circle at center, rgba($color-dark-interactive, .65) 0, rgba($color-dark-interactive, 0) 40%) no-repeat;
+    }
+  }
+
+  .gradient-bg {
+    z-index: -1;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    position: absolute;
+    overflow: hidden;
+    background: linear-gradient(217deg, $color-bg-1, rgba(0,0,0,0)),
+      linear-gradient(127deg, $color-bg-2, rgba(0,0,0,0)),
+      linear-gradient(316deg, $color-bg-3, rgba(0,0,0,0));
+
+    svg {
+      display: none;
+    }
+
+    .gradients-container {
+      filter: url(#goo) blur(6px);
+      width: 100%;
+      height: 100%;
+    }
+
+    .g1 {
+      position: absolute;
+      background: radial-gradient(circle at center, rgba($color1, $inner-circle-opacity) 0, rgba($color1, 0) 40%) no-repeat;
+      mix-blend-mode: $blending;
+
+      width: $circle-size-large;
+      height: $circle-size-large;
+      top: calc(50% - $circle-size-large / 2);
+      left: calc(50% - $circle-size-large / 2);
+
+      transform-origin: center center;
+      animation: moveVertical 30s ease infinite;
+
+      opacity: $circle-opacity;
+    }
+
+    .g2 {
+      position: absolute;
+      background: radial-gradient(circle at center, rgba($color2, $inner-circle-opacity) 0, rgba($color2, 0) 40%) no-repeat;
+      mix-blend-mode: $blending;
+
+      width: $circle-size-medium;
+      height: $circle-size-medium;
+      top: calc(50% - $circle-size-medium / 2);
+      left: calc(65% - $circle-size-medium / 2);
+
+      transform-origin: 20% center;
+      animation: moveInCircle 20s reverse infinite;
+
+      opacity: $circle-opacity;
+    }
+
+    .g3 {
+      position: absolute;
+      background: radial-gradient(circle at center, rgba($color3, $inner-circle-opacity) 0, rgba($color3, 0) 40%) no-repeat;
+      mix-blend-mode: $blending;
+
+      width: $circle-size-large;
+      height: $circle-size-large;
+      top: calc(60% - $circle-size-large / 2);
+      left: calc(20% - $circle-size-large / 2);
+
+      transform-origin: 80% center;
+      animation: moveInCircle 40s linear infinite;
+
+      opacity: $circle-opacity;
+    }
+
+    .g4 {
+      position: absolute;
+      background: radial-gradient(circle at center, rgba($color4, $inner-circle-opacity) 0, rgba($color4, 0) 40%) no-repeat;
+      mix-blend-mode: $blending;
+
+      width: $circle-size-medium;
+      height: $circle-size-medium;
+      top: calc(50% - $circle-size-medium / 2);
+      left: calc(50% - $circle-size-medium / 2);
+
+      transform-origin: calc(50% - 200px);
+      animation: moveHorizontal 40s ease infinite;
+
+      opacity: $circle-opacity;
+    }
+
+    .g5 {
+      position: absolute;
+      background: radial-gradient(circle at center, rgba($color5, $inner-circle-opacity) 0, rgba($color5, 0) 40%) no-repeat;
+      mix-blend-mode: $blending;
+
+      width: calc($circle-size-small * 2);
+      height: calc($circle-size-small * 2);
+      top: calc(50% - $circle-size-small);
+      left: calc(50% - $circle-size-small);
+
+      transform-origin: calc(50% - 800px) calc(50% + 200px);
+      animation: moveInCircle 20s ease infinite;
+
+      opacity: $circle-opacity;
+    }
+
+    .interactive {
+      position: absolute;
+      background: radial-gradient(circle at center, rgba($color-interactive, .65) 0, rgba($color-interactive, 0) 40%) no-repeat;
+      mix-blend-mode: $blending;
+
+      width: calc($circle-size-interactive * 2);
+      height: calc($circle-size-interactive * 2);
+      top: calc($circle-size-interactive / -1);
+      left: calc($circle-size-interactive / -1);
+
+      opacity: $circle-opacity;
+    }
+  }
+</style>

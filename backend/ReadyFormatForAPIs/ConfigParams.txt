@@ -1,0 +1,4 @@
+Topic: Linear Algebra
+EducationLevel: Bachelor
+ToneStyle: Neutral
+Language: English
