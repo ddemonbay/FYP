@@ -1,0 +1,86 @@
+.content-container {
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: center;
+}
+
+.block {
+  font-size: 1.16em;
+  width: 80%;
+  position: absolute;
+  top: $content-margin-top;
+
+  & > *+* {
+    margin-bottom: 1em;
+  }
+}
+
+.login-block {
+  font-family: "barlow condensed";
+  text-align: center;
+  margin: auto;
+  width: 30em;
+  padding: .8em 1.4em;
+  
+  h2 {
+    margin-top: 0;
+    font-size: 2.8em;
+  }
+  
+  p {
+    margin-bottom: 1.5em;
+  }
+
+  input, button {
+    margin-top: 2.6em;
+  }
+}
+
+.action-block {
+  width: 38%;
+  text-align: center;
+
+  .choice-container {
+    display: flex;
+    justify-content: center;
+  
+    & > * + * {
+      margin-left: 1em;
+    }
+
+    .card {
+      padding: 1em;
+      cursor: pointer;
+      transition: .4s;
+    
+      &:hover {
+        background: rgba( 255, 255, 255, 0.13 );
+        color: rgba( 255, 255, 255, 0.74 );
+      }
+    }
+  }
+}
+
+.back-button {
+  position: absolute;
+  top: 50%;
+  left: 8%;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.forward-button {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center
+}

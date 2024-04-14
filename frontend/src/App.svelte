@@ -10,6 +10,8 @@
   let themeIconRotation = "0deg";
   let backStack = [];
   let forwardStack = [];
+  let curriculum;
+  let curriculumHist;
 
   const changeTheme = () => {
     theme = theme == "light" ? "dark" : "light";
@@ -24,9 +26,14 @@
 </script>
 
 <main>
-  <Navbar bind:backStack bind:forwardStack bind:block />
-  <Content bind:backStack bind:forwardStack bind:block bind:theme />
-  <img class="theme-switch-btn" src={contrastImage} on:click={changeTheme} style:rotate={themeIconRotation}>
+  <Navbar bind:backStack bind:forwardStack bind:block bind:curriculum bind:curriculumHist />
+  <Content bind:backStack bind:forwardStack bind:block bind:theme bind:curriculum bind:curriculumHist />
+  <img
+    class="theme-switch-btn"
+    src={contrastImage}
+    on:click={changeTheme}
+    style:rotate={themeIconRotation}
+  >
 </main>
 
 <GradientBackground bind:theme />

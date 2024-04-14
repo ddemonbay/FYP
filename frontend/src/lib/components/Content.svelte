@@ -9,76 +9,25 @@
 
   export let backStack;
   export let forwardStack;
+  export let curriculum;
+  export let curriculumHist;
 
   const LOGIN_FLY_DURATION = 700;
   const BLOCK_FADE_OUT_DURATION = 200;
   const BLOCK_FADE_IN_DELAY = 500;
   const BLOCK_FADE_IN_DURATION = 700;
+  const BACKEND_URL = "https://ugymjg1tfk.execute-api.us-east-1.amazonaws.com/Implementation/tutorial";
 
   let displayText = "";
   let finalText = "";
   let prevBlock = block
+  let topicInput = "";
+  let username = "damon";
+  let topicIdPair;
+  let finalTexts = [];
+  let displayTexts = [];
 
-  let topics = [
-    {
-    "title": "Wave",
-    "explanation": "wave is related to duality of light, which is a photon exhibits the phenomenon of a particle and a wave.",
-    "subTopics": [
-      {
-        "category": "Prerequesite",
-        "courses": [
-          {
-            "courseId": "0.1",
-            "courseName": "linear algebra",
-            "explanation": "linear algebra is EZ",
-          },
-          {
-            "courseId": "0.2",
-            "courseName": "fundamental quantum physics",
-            "explanation": "fundamental quantum physics is not fundamental",
-          }
-        ]
-      }, 
-      {
-        "category": "Particle Duality",
-        "courses": [
-          {
-            "courseId": "1.1",
-            "courseName": "photon",
-            "explanation": "photon is light",
-          },
-          {
-            "courseId": "1.2",
-            "courseName": "particle property",
-            "explanation": "it is like atom",
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "title": "linear algebra",
-    "explanation": "wave is related to duality of light, which is a photon exhibits the phenomenon of a particle and a wave.",
-    "subTopics": [
-      {
-        "category": "Metrix",
-        "courses": [
-          {
-            "courseId": "1.1",
-            "courseName": "vector space",
-            "explanation": "vector space (also called a linear space) is a set whose elem...",
-          },
-          {
-            "courseId": "1.2",
-            "courseName": "linear maps",
-            "explanation": "Linear maps are mappings between vector spaces that pres...",
-          }
-        ]
-      }
-    ]
-  }
-  ]
-  let topic = topics[0];
+  let topic;
 
   function showText() {
     if (finalText.length > displayText.length) {
@@ -94,9 +43,55 @@
     }
   }
 
-  const selectTopicBlock = (selectedTopic) => {
+  async function selectTopicBlock(selectedTopicId) {
+    navToBlock("loading");
+    topic = await getTopic(selectedTopicId);
+    curriculum = null;
+    curriculumHist = null;
     block = "topic-block";
-    topic = topics.find((t) => t == selectedTopic);
+  }
+
+  async function getTopic(topicId) {
+    let getPrerequisitesResponse = await fetch(BACKEND_URL + "/getPrerequisites", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: topicId,
+      }),
+      headers: {
+        "authorizationUserLoginToken": "qwertyuiop:" + username,
+      }
+    });
+
+    let getPrerequisitesData = await getPrerequisitesResponse.json();
+    if (getPrerequisitesData == "Error") {
+      getPrerequisitesData = {"prerequisites": {
+			"Knowledge Requirements": "",
+			"Suggested Preparatory Material": "",
+		}}
+    }
+    
+
+    let getCurriculumResponse = await fetch(BACKEND_URL + "/getCurriculum", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: topicId,
+      }),
+      headers: {
+        "authorizationUserLoginToken": "qwertyuiop:" + username,
+      }
+    });
+
+    let getCurriculumData = await getCurriculumResponse.json();
+    if (getCurriculumData == "Error") {
+      getCurriculumData = {"curriculum": {}}
+    }
+
+    return {
+      "topicId": topicId,
+      "title": topicIdPair[topicId],
+      "prerequisites": getPrerequisitesData["prerequisites"],
+      "curriculum": getCurriculumData["curriculum"],
+    }
   }
 
   // preserve nav hist
@@ -108,19 +103,82 @@
       forwardStack.pop();
     }
     block = name;
-    console.log(backStack, forwardStack)
   }
   
   const back = () => {
-    forwardStack.push(block);
-    block = backStack.pop();
-    console.log(backStack, forwardStack)
+    if (block == "topic-block" && curriculum != null) {
+      curriculumHist = curriculum;
+      curriculum = null;
+    } else {
+      forwardStack.push(block);
+      block = backStack.pop();
+    }
   }
 
   const forward = () => {
-    backStack.push(block);
-    block = forwardStack.pop();
-    console.log(backStack, forwardStack)
+    if (block == "topic-block" && curriculumHist != null) {
+      curriculum = curriculumHist;
+      curriculumHist = null;
+    } else {
+      backStack.push(block);
+      block = forwardStack.pop();
+    }
+  }
+
+  async function searchTopic() {
+    navToBlock("loading");
+
+    let topicId;
+    let generateTopicResponse = await fetch(BACKEND_URL + "/generateTopic", {
+      method: "POST",
+      body: JSON.stringify({
+        topic: topicInput,
+      }),
+      headers: {
+        "authorizationUserLoginToken": "qwertyuiop:" + username,
+      }
+    });
+
+    let generateTopicData = await generateTopicResponse.json();
+
+    if (generateTopicData == "Topic Exist") {
+      for (let i in topicIdPair) {
+        if (topicIdPair[i].toLowerCase().trim() == topicInput.toLowerCase().trim()) {
+          topicId = i;
+        }
+      }
+    } else if (generateTopicData.includes("Topic ID:")) {
+      topicId = parseInt(generateTopicData.substring(9));
+    } else {
+      console.log("error occuring connecting to backend");
+      block = "topic-search";
+    }
+    topic = await getTopic(topicId)
+    
+    topicIdPair = await getTopicIdPair();
+    block = "topic-block";
+    topicInput = "";
+  }
+
+  async function login() {
+    block = "loading";
+    topicIdPair = await getTopicIdPair();
+    
+    setTimeout(() => {
+      block = "action"
+    }, LOGIN_FLY_DURATION)
+  }
+
+  async function getTopicIdPair() {
+    let getTopicIdPairResponse = await fetch(BACKEND_URL + "/getTopicIdPair", {
+      method: "POST",
+      headers: {
+        "authorizationUserLoginToken": "qwertyuiop:" + username,
+      }
+    });
+
+    let getTopicIdPairData = await getTopicIdPairResponse.json();
+    return getTopicIdPairData["topicIdPair"];
   }
 
   afterUpdate(() => {
@@ -150,7 +208,7 @@
     </div>
   {/if}
 
-  {#if block != "login" && forwardStack.length != 0 }
+  {#if block != "login" && (forwardStack.length != 0 || (block == "topic-block" && curriculumHist != null)) }
     <div
       class="forward-button"
       on:click={() => forward()}
@@ -165,7 +223,7 @@
       <p>Please login to start your learning journey</p>
       <input type="text" placeholder="Username"/>
       <input type="password" placeholder="Password"/>
-      <button class="btn-underline" on:click={() => {block = "loading"; setTimeout(() => {block = "action"}, LOGIN_FLY_DURATION)}} style="left: 1px">Submit</button>
+      <button class="btn-underline" on:click={() => login()} style="left: 1px">Submit</button>
     </div>
   {/if}
   
@@ -183,8 +241,8 @@
     <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
       <p>{displayText}</p>
       <div class="text-bar">
-        <input type="text" placeholder="Search a topic you want to learn.." />
-        <div class="go-btn" on:click={() => navToBlock("topic-block")}>{">"}</div>
+        <input type="text" bind:value={topicInput} placeholder="Search a topic you want to learn.." />
+        <div class="go-btn" on:click={() => searchTopic()}>{">"}</div>
       </div>
     </div>
   {/if}
@@ -193,12 +251,12 @@
     <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
       <p>{displayText}</p>
       <ul>
-        {#each topics as topic}
+        {#each Object.entries(topicIdPair) as [topicId, title]}
           <li
-            on:click={() => selectTopicBlock(topic)}
+            on:click={() => selectTopicBlock(topicId)}
             class="btn-transparent"
           >
-            {topic.title}
+            {title}
           </li>
         {/each}
       </ul>
@@ -207,94 +265,21 @@
 
   {#if block == "topic-block"}
     <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
-      <TopicBlock bind:topic bind:topics bind:theme />
+      <TopicBlock bind:topic bind:curriculum bind:theme bind:block bind:finalTexts bind:displayTexts />
     </div>
+  {/if}
+
+  {#if block == "loading"}
+  <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
+    <div class="loading-screen">
+      <p>.............</p>
+    </div>
+  </div>
   {/if}
 
 </div>
 
 <style lang="scss">
-  @import "../../root.scss";
-
-  .content-container {
-    width: 100%;
-    height: 100%;
-    text-align: left;
-    display: flex;
-    justify-content: center;
-    // position: relative;
-  }
-  
-  .block {
-    font-size: 1.16em;
-    width: 80%;
-    position: absolute;
-    top: $content-margin-top;
-
-    & > *+* {
-      margin-bottom: 1em;
-    }
-  }
-
-  .login-block {
-    font-family: "barlow condensed";
-    text-align: center;
-    margin: auto;
-    width: 30em;
-    padding: .8em 1.4em;
-    
-    h2 {
-      margin-top: 0;
-      font-size: 2.8em;
-    }
-    
-    p {
-      margin-bottom: 1.5em;
-    }
-
-    input, button {
-      margin-top: 2.6em;
-    }
-  }
-
-  .action-block {
-    width: 38%;
-    text-align: center;
-  }
-
-  .card {
-    padding: 1em;
-    cursor: pointer;
-    transition: .4s;
-  
-    &:hover {
-      background: rgba( 255, 255, 255, 0.13 );
-      color: rgba( 255, 255, 255, 0.74 );
-    }
-  }
-
-  .choice-container {
-    display: flex;
-    justify-content: center;
-
-    & > * + * {
-      margin-left: 1em;
-    }
-  }
-
-  .back-button {
-    position: absolute;
-    top: 50%;
-    left: 8%;
-    font-size: 1.4rem;
-    cursor: pointer;
-  }
-
-  .forward-button {
-    position: absolute;
-    top: 50%;
-    right: 8%;
-    font-size: 1.4rem;
-    cursor: pointer;
-  }
+  @import "../../styles/root.scss";
+  @import "../../styles/content.scss";    
 </style>

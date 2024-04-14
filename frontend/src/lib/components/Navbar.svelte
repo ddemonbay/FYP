@@ -2,14 +2,18 @@
 
   import { fade } from 'svelte/transition';
   import { GET_STARTED_FADE_IN_DURATION } from '../constants';
-    import TopicBlock from './TopicBlock.svelte';
+  import TopicBlock from './TopicBlock.svelte';
 
   export let block;
   export let forwardStack;
   export let backStack;
+  export let curriculum;
+  export let curriculumHist;
   
   const toBlock = (name) => {
     block = name;
+    curriculum = null;
+    curriculumHist = null;
     if (name == "topic-search" || name == "resume-topic") {
       forwardStack = [];
       backStack = ["action"];
@@ -41,79 +45,6 @@
 {/if}
 
 <style lang="scss">
-  @import "../../root.scss";
-
-  header {
-    display: flex;
-    position: relative;
-    padding: 2em 3.8em;
-    justify-content: space-between;
-
-    h1 {
-      font-size: 2.1em;
-      margin: 0;
-      line-height: 1.1; // matching hamburger menu
-    }
-  }
-
-  .logo {
-    cursor: pointer;
-  }
-
-  .menu{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    right: 3em;
-
-    &:hover {
-      svg {
-        .top {
-          transform: rotate(45deg);
-          transform-origin: center top;
-          x: 50px;
-          y: 35px;
-        }
-        .bottom {
-          transform: rotate(-45deg);
-          transform-origin: center top;
-          x: -20px;
-          y: 25px;
-        }
-      }
-
-      .menu-dropdown {
-        visibility: visible;
-        opacity: 1;
-      }
-    }
-  }
-
-  .menu-dropdown {
-    text-align: right;
-    position: absolute;
-    right: .24em;
-    top: 0;
-    padding-top: 3em;
-    transition: .5s;
-    visibility: hidden;
-    opacity: 0;
-
-    & > * {
-      user-select: none;
-    }
-
-    & > *+* {
-      margin-top: .1em;
-    }
-  }
-
-  svg {
-    cursor: pointer;
-    
-    rect {
-      transition: all .3s ease-in-out;
-    }
-  } 
+  @import "../../styles/root.scss";
+  @import "../../styles/navbar.scss";   
 </style>

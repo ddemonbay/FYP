@@ -1,0 +1,60 @@
+@import "./variables.scss";
+
+.topic-block-wrapper {
+  position: absolute;
+  width: 100%;
+
+  .topic-block {
+    max-height: 60vh;
+    overflow: auto;
+  
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+  
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(42, 0, 126,.6); // rgba(255,255,255,0.3)
+      border-radius: 10px;
+      
+      &:hover {
+        background: rgba(42, 0, 126,.8); 
+      }
+    }
+  
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(42, 0, 126,.9); 
+      scrollbar-color: rgba(42, 0, 126,1) rgba(255,255,255,0);
+    }
+  
+    .btn-transparent {
+      font-style: italic;
+    }
+  
+    h2 {
+      margin-top: .2em;
+    }
+    h4 {
+      margin-bottom: .6em;
+    }
+
+    .title { 
+      color: $color-accent-1;
+    }
+  
+    .btn-underline {
+      margin-top: 1em;
+    }
+  }
+}
+
+.text-bar {
+  margin-top: 1.2em;
+
+  input {
+    width: 80%;
+  }
+}
