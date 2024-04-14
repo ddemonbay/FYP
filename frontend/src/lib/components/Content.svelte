@@ -137,7 +137,7 @@
         }
       }
     } else if (generateTopicData.includes("Topic ID:")) {
-      topicId = parseInt(generateTopicData.substring(9));
+      topicId = parseInt(generateTopicData.substring(9));console.log(topicId)
     } else {
       console.log("error occuring connecting to backend");
       block = "topic-search";
@@ -269,7 +269,11 @@
   {#if block == "loading"}
   <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
     <div class="loading-screen">
-      <p>.............</p>
+      <div>
+        <span class="loading-dot-1">.</span>
+        <span class="loading-dot-2">.</span>
+        <span class="loading-dot-3">.</span>
+      </div>
     </div>
   </div>
   {/if}

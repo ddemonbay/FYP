@@ -81,6 +81,52 @@
 
 .loading-screen {
   display: flex;
+  height: 50vh;
   justify-content: center;
-  align-items: center
+  align-items: center;
+
+  .loading-dot-1 {
+    font-size: 1.7em;
+    animation-name: loading-dot-1;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+  }
+
+  .loading-dot-2 {
+    font-size: 1.7em;
+    animation-name: loading-dot-2;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+  }
+
+  .loading-dot-3 {
+    font-size: 1.7em;
+    animation-name: loading-dot-3;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+  }
+}
+
+@keyframes loading-dot-1 {
+  0%   {opacity: 0;}
+  25%  {opacity: 0;}
+  50%  {opacity: 1;}
+  75%  {opacity: 1;}
+  100% {opacity: 1;}
+}
+
+@keyframes loading-dot-2 {
+  0%   {opacity: 0;}
+  25%  {opacity: 0;}
+  50%  {opacity: 0;}
+  75%  {opacity: 1;}
+  100% {opacity: 1;}
+}
+
+@keyframes loading-dot-3 {
+  0%   {opacity: 0;}
+  25%  {opacity: 0;}
+  50%  {opacity: 0;}
+  75%  {opacity: 0;}
+  100% {opacity: 1;}
 }
