@@ -5,6 +5,7 @@
   import contrastImage from "./assets/contrast.png"
   import { onMount } from "svelte";
 
+  let username = "damon";
   let block = "login";
   let theme = "light";
   let themeIconRotation = "0deg";
@@ -26,8 +27,22 @@
 </script>
 
 <main>
-  <Navbar bind:backStack bind:forwardStack bind:block bind:curriculum bind:curriculumHist />
-  <Content bind:backStack bind:forwardStack bind:block bind:theme bind:curriculum bind:curriculumHist />
+  <Navbar
+    bind:backStack
+    bind:forwardStack
+    bind:block
+    bind:curriculum
+    bind:curriculumHist
+  />
+  <Content
+    bind:username
+    bind:backStack
+    bind:forwardStack
+    bind:block
+    bind:theme
+    bind:curriculum
+    bind:curriculumHist
+  />
   <img
     class="theme-switch-btn"
     src={contrastImage}

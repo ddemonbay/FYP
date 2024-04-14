@@ -1,17 +1,15 @@
 <script>
   import { afterUpdate, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
+  import { BACKEND_URL, QUIZ_PROMPT, BLOCK_FADE_IN_DELAY, BLOCK_FADE_IN_DURATION, BLOCK_FADE_OUT_DURATION } from "../constants";
 
+  export let username;
   export let topic;
   export let curriculum;
   export let theme;
   export let block;
   export let finalTexts;
   export let displayTexts;
-
-  const QUIZ_PROMPT = "Give me a quiz question in multiple choice format";
-  const BACKEND_URL = "https://ugymjg1tfk.execute-api.us-east-1.amazonaws.com/Implementation/tutorial";
-  let username = "damon";
   
   let writer;
   let topicBlock;
@@ -20,8 +18,8 @@
   script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
 
   async function sendQuery(query) {
-    finalTexts = [...finalTexts, userQueryInput + "\n"];
-    displayTexts = [...displayTexts, userQueryInput + "\n"];
+    finalTexts = [...finalTexts, userQueryInput];
+    displayTexts = [...displayTexts, userQueryInput];
     let userQuery = userQueryInput;
     userQueryInput = "";
 
@@ -38,12 +36,11 @@
     });
 
     let sendGptMsgData = await sendGptMsgResponse.json();
-    
 
     if (sendGptMsgData == "Processing") {
       let latestMsg = await recursiveGetLatestMsg(curriculum.curriculumId);
       latestMsg = latestMsg.chatHistory[latestMsg.chatHistory.length - 1][1];
-      finalTexts = [...finalTexts, latestMsg + "\n"];
+      finalTexts = [...finalTexts, latestMsg];
       displayTexts = [...displayTexts, ""];
     }
   }
@@ -126,7 +123,6 @@
     }
   }
     
-
   async function changeTopic(curriculumId, curriculumName) {
     block = "loading";
 
@@ -160,26 +156,18 @@
     };
   }
 
-  onMount(() => {
-    if (!writer) {
-      writer = setTimeout(showText, 500);
-    }
-
-    updateLatex();
-  })
-
   function showText() {
     let lastIndex = displayTexts.length - 1;
     if (finalTexts[lastIndex].length > displayTexts[lastIndex].length) {
       displayTexts[lastIndex] = finalTexts[lastIndex].slice(0, displayTexts[lastIndex].length + 1);
-    if (displayTexts[displayTexts[lastIndex].length - 1]) {
-      setTimeout(showText, 20); // longer pause between words
+      if (displayTexts[displayTexts[lastIndex].length - 1]) {
+        setTimeout(showText, 20); // longer pause between words
+      } else {
+        setTimeout(showText, 5);
+      }
     } else {
-      setTimeout(showText, 5);
+      writer = null
     }
-  } else {
-    writer = null
-  }
   }
 
   afterUpdate(() => {
@@ -188,26 +176,34 @@
     } 
     updateLatex();
   })
+
+  onMount(() => {
+    if (!writer) {
+      writer = setTimeout(showText, 500);
+    }
+
+    updateLatex();
+  })
 </script>
 
 {#key curriculum}
   <div
     class="topic-block-wrapper"
     class:dark={theme == "dark"} 
-    in:fade = {{ delay: 170, duration: 600 }}
-    out:fade = {{ duration: 200 }} 
+    in:fade = {{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }}
+    out:fade = {{ duration: BLOCK_FADE_OUT_DURATION }} 
   >
     <div
       class="glass-container topic-block"
       bind:this={topicBlock}
     >
       {#if curriculum}
-        <h2 on:click={() => alert(displayTexts)} class="title">{curriculum.curriculumName}</h2>
+        <h2 class="title">{curriculum.curriculumName}</h2>
         {#each displayTexts as displayText, i}
           {#if i % 2 == 0}
-            <p>{@html displayText.replace(/\n/g, '<br>')}</p>
+            <p>{displayText}</p>
           {:else if !displayText.includes(QUIZ_PROMPT)}
-            <p style="color: rgba(42, 0, 126,1);">{@html displayText.replace(/\n/g, '<br>')}</p>
+            <p class="color-accent-2">{displayText}</p>
           {/if}
         {/each}
         <button

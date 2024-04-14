@@ -2,32 +2,55 @@
   import { slide, fly, fade } from 'svelte/transition';
   import { afterUpdate, onMount } from 'svelte';
   import TopicBlock from "./TopicBlock.svelte";
-  import { GET_STARTED_FADE_IN_DURATION } from '../constants';
+  import { LOGIN_FLY_IN_DURATION, LOGIN_FLY_OUT_DURATION, GET_STARTED_FADE_IN_DURATION, BLOCK_FADE_OUT_DURATION, BLOCK_FADE_IN_DELAY, BLOCK_FADE_IN_DURATION, BACKEND_URL } from '../constants';
 
   export let block;
   export let theme;
-
+  export let username;
   export let backStack;
   export let forwardStack;
   export let curriculum;
   export let curriculumHist;
 
-  const LOGIN_FLY_DURATION = 700;
-  const BLOCK_FADE_OUT_DURATION = 200;
-  const BLOCK_FADE_IN_DELAY = 500;
-  const BLOCK_FADE_IN_DURATION = 700;
-  const BACKEND_URL = "https://ugymjg1tfk.execute-api.us-east-1.amazonaws.com/Implementation/tutorial";
-
+  let prevBlock = block;
   let displayText = "";
   let finalText = "";
-  let prevBlock = block
-  let topicInput = "";
-  let username = "damon";
-  let topicIdPair;
-  let finalTexts = [];
   let displayTexts = [];
-
+  let finalTexts = [];
   let topic;
+  let topicIdPair;
+  let topicInput = "";
+
+  // preserve nav hist
+  const navToBlock = (name) => {
+    backStack.push(block);
+    if (name != forwardStack[forwardStack.length - 1]) { // if new action != forward action
+      forwardStack = [];
+    } else { // same action == forward -> pop forward stack
+      forwardStack.pop();
+    }
+    block = name;
+  }
+  
+  const back = () => {
+    if (block == "topic-block" && curriculum != null) {
+      curriculumHist = curriculum;
+      curriculum = null;
+    } else {
+      forwardStack.push(block);
+      block = backStack.pop();
+    }
+  }
+
+  const forward = () => {
+    if (block == "topic-block" && curriculumHist != null) {
+      curriculum = curriculumHist;
+      curriculumHist = null;
+    } else {
+      backStack.push(block);
+      block = forwardStack.pop();
+    }
+  }
 
   function showText() {
     if (finalText.length > displayText.length) {
@@ -38,8 +61,6 @@
       } else {
         setTimeout(showText, 5);
       }
-    } else {
-      // showButton
     }
   }
 
@@ -70,7 +91,6 @@
 		}}
     }
     
-
     let getCurriculumResponse = await fetch(BACKEND_URL + "/getCurriculum", {
       method: "POST",
       body: JSON.stringify({
@@ -91,37 +111,6 @@
       "title": topicIdPair[topicId],
       "prerequisites": getPrerequisitesData["prerequisites"],
       "curriculum": getCurriculumData["curriculum"],
-    }
-  }
-
-  // preserve nav hist
-  const navToBlock = (name) => {
-    backStack.push(block);
-    if (name != forwardStack[forwardStack.length - 1]) { // if new action != forward action
-      forwardStack = [];
-    } else { // same action == forward -> pop forward stack
-      forwardStack.pop();
-    }
-    block = name;
-  }
-  
-  const back = () => {
-    if (block == "topic-block" && curriculum != null) {
-      curriculumHist = curriculum;
-      curriculum = null;
-    } else {
-      forwardStack.push(block);
-      block = backStack.pop();
-    }
-  }
-
-  const forward = () => {
-    if (block == "topic-block" && curriculumHist != null) {
-      curriculum = curriculumHist;
-      curriculumHist = null;
-    } else {
-      backStack.push(block);
-      block = forwardStack.pop();
     }
   }
 
@@ -160,15 +149,6 @@
     topicInput = "";
   }
 
-  async function login() {
-    block = "loading";
-    topicIdPair = await getTopicIdPair();
-    
-    setTimeout(() => {
-      block = "action"
-    }, LOGIN_FLY_DURATION)
-  }
-
   async function getTopicIdPair() {
     let getTopicIdPairResponse = await fetch(BACKEND_URL + "/getTopicIdPair", {
       method: "POST",
@@ -179,6 +159,15 @@
 
     let getTopicIdPairData = await getTopicIdPairResponse.json();
     return getTopicIdPairData["topicIdPair"];
+  }
+
+  async function login() {
+    block = "loading";
+    topicIdPair = await getTopicIdPair();
+    
+    setTimeout(() => {
+      block = "action"
+    }, LOGIN_FLY_OUT_DURATION)
   }
 
   afterUpdate(() => {
@@ -218,7 +207,7 @@
   {/if}
 
   {#if block == "login"}
-    <div class="login-block glass-container" in:fly={{ y: -70, duration: 800 }} out:fly={{ y: -90, duration: LOGIN_FLY_DURATION }}>
+    <div class="login-block glass-container" in:fly={{ y: -70, duration: LOGIN_FLY_IN_DURATION }} out:fly={{ y: -90, duration: LOGIN_FLY_OUT_DURATION }}>
       <h2 class="logo">AI Tutor</h2>
       <p>Please login to start your learning journey</p>
       <input type="text" placeholder="Username"/>
@@ -265,7 +254,15 @@
 
   {#if block == "topic-block"}
     <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
-      <TopicBlock bind:topic bind:curriculum bind:theme bind:block bind:finalTexts bind:displayTexts />
+      <TopicBlock
+        bind:username
+        bind:topic
+        bind:curriculum
+        bind:theme
+        bind:block
+        bind:finalTexts
+        bind:displayTexts
+      />
     </div>
   {/if}
 
