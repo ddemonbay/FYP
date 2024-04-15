@@ -338,6 +338,7 @@
   {#if block == "topic-block"}
     <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
       <TopicBlock
+        changeFunFact = {changeFunFact}
         bind:username
         bind:topic
         bind:curriculum

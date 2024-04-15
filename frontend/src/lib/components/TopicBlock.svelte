@@ -11,6 +11,7 @@
   export let block;
   export let finalTexts;
   export let displayTexts;
+  export let changeFunFact;
   
   let writer;
   let doneWriting = true;
@@ -126,6 +127,7 @@
     
   async function changeTopic(curriculumId, curriculumName) {
     block = "loading";
+    changeFunFact(curriculumName)
 
     curriculum = await getOrGenerateCurriculum(curriculumId, curriculumName);
 
