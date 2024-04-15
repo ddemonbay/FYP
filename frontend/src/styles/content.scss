@@ -17,6 +17,41 @@
   }
 }
 
+.resume-block {
+  height: 70vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(42, 0, 126,.6); // rgba(255,255,255,0.3)
+    border-radius: 10px;
+    
+    &:hover {
+      background: rgba(42, 0, 126,.8); 
+    }
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(42, 0, 126,.9); 
+    scrollbar-color: rgba(42, 0, 126,1) rgba(255,255,255,0);
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    .remove-btn {
+      
+    }
+  }
+}
+
 .login-block {
   font-family: "barlow condensed";
   text-align: center;

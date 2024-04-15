@@ -72,7 +72,15 @@
     block = "topic-block";
   }
 
-  async function getTopic(topicId) {
+  async function delay(time) {
+    return new Promise(res => {
+      setTimeout(res,time)
+    })
+  }
+
+  let recursiveGetPrerequisitesDataCounter = 0;
+
+  async function recursiveGetPrerequisitesData(topicId) {
     let getPrerequisitesResponse = await fetch(BACKEND_URL + "/getPrerequisites", {
       method: "POST",
       body: JSON.stringify({
@@ -85,12 +93,21 @@
 
     let getPrerequisitesData = await getPrerequisitesResponse.json();
     if (getPrerequisitesData == "Error") {
-      getPrerequisitesData = {"prerequisites": {
-			"Knowledge Requirements": "",
-			"Suggested Preparatory Material": "",
-		}}
+      if (recursiveGetPrerequisitesDataCounter == 12) { // timeout - probably actual error in backend instead of processing
+        recursiveGetPrerequisitesDataCounter = 0;
+        return getPrerequisitesData;
+      }
+      await delay(4000);
+      recursiveGetPrerequisitesDataCounter ++;
+      console.log("waiting prerequisite data");
+      getPrerequisitesData = await recursiveGetPrerequisitesData(topicId);
     }
-    
+    return getPrerequisitesData;
+  }
+
+  let recursiveGetCurriculumDataCounter = 0;
+
+  async function recursiveGetCurriculumData(topicId) {
     let getCurriculumResponse = await fetch(BACKEND_URL + "/getCurriculum", {
       method: "POST",
       body: JSON.stringify({
@@ -103,8 +120,39 @@
 
     let getCurriculumData = await getCurriculumResponse.json();
     if (getCurriculumData == "Error") {
+      if (recursiveGetCurriculumDataCounter == 12) { // timeout - probably actual error in backend instead of processing
+        recursiveGetCurriculumDataCounter = 0;
+        return getCurriculumData;
+      }
+      await delay(4000);
+      recursiveGetCurriculumDataCounter ++;
+      console.log()
+      console.log("waiting curriculum data");
+      getCurriculumData = await recursiveGetCurriculumData(topicId);
+    }
+    return getCurriculumData;
+  }
+
+  async function getTopic(topicId) {
+    let getPrerequisitesData = await recursiveGetPrerequisitesData(topicId); // get until finish generate topic
+
+    if (getPrerequisitesData == "Error") {
+      getPrerequisitesData = {"prerequisites": {
+        "Knowledge Requirements": "",
+        "Suggested Preparatory Material": "",
+      }}
+    }
+    
+    let getCurriculumData = await recursiveGetCurriculumData(topicId);
+    if (getCurriculumData == "Error") {
       getCurriculumData = {"curriculum": {}}
     }
+    console.log({
+      "topicId": topicId,
+      "title": topicIdPair[topicId],
+      "prerequisites": getPrerequisitesData["prerequisites"],
+      "curriculum": getCurriculumData["curriculum"],
+    })
 
     return {
       "topicId": topicId,
@@ -137,14 +185,14 @@
         }
       }
     } else if (generateTopicData.includes("Topic ID:")) {
-      topicId = parseInt(generateTopicData.substring(9));console.log(topicId)
+      topicId = parseInt(generateTopicData.substring(9));
     } else {
       console.log("error occuring connecting to backend");
       block = "topic-search";
     }
-    topic = await getTopic(topicId)
-    
     topicIdPair = await getTopicIdPair();
+    topic = await getTopic(topicId);
+    
     block = "topic-block";
     topicInput = "";
   }
@@ -237,15 +285,13 @@
   {/if}
 
   {#if block == "resume-topic"}
-    <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
+    <div class="block resume-block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
       <p>{displayText}</p>
       <ul>
         {#each Object.entries(topicIdPair) as [topicId, title]}
-          <li
-            on:click={() => selectTopicBlock(topicId)}
-            class="btn-transparent"
-          >
-            {title}
+          <li>
+            <span class="btn-transparent" on:click={() => selectTopicBlock(topicId)}>{title}</span>
+            <span class="btn-transparent remove-btn">X</span>
           </li>
         {/each}
       </ul>
