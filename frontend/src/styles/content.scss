@@ -60,7 +60,8 @@
   padding: .8em 1.4em;
   
   h2 {
-    margin-top: 0;
+    margin-top: 0.3em;
+    margin-bottom: 0;
     font-size: 2.8em;
   }
   
@@ -70,6 +71,10 @@
 
   input, button {
     margin-top: 2.6em;
+  }
+
+  button {
+    margin-bottom: 1em;
   }
 }
 
