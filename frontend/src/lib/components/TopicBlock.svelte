@@ -157,6 +157,7 @@
   }
 
   function showText() {
+    if (!curriculum) return;
     let lastIndex = displayTexts.length - 1;
     if (finalTexts[lastIndex].length > displayTexts[lastIndex].length) {
       displayTexts[lastIndex] = finalTexts[lastIndex].slice(0, displayTexts[lastIndex].length + 1);
@@ -201,7 +202,7 @@
         <h2 class="title">{curriculum.curriculumName}</h2>
         {#each displayTexts as displayText, i}
           {#if i % 2 == 0}
-            <p>{displayText}</p>
+            <p>{@html displayText}</p>
           {:else if !displayText.includes(QUIZ_PROMPT)}
             <p class="color-accent-2">{displayText}</p>
           {/if}
