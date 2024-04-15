@@ -226,6 +226,23 @@
     return getTopicIdPairData["topicIdPair"];
   }
 
+  async function deleteTopic(topicId) {
+    let deleteTopicResponse = await fetch(BACKEND_URL + "/deleteTopic", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: topicId,
+      }),
+      headers: {
+        "authorizationUserLoginToken": "qwertyuiop:" + username,
+      }
+    });
+
+    let deleteTopicData = await deleteTopicResponse.json();
+    if (deleteTopicData == "deleted") {
+      topicIdPair = await getTopicIdPair();
+    }
+  }
+
   async function login() {
     block = "loading";
     topicIdPair = await getTopicIdPair();
@@ -306,10 +323,13 @@
       <p>{displayText}</p>
       <ul>
         {#each Object.entries(topicIdPair) as [topicId, title]}
+          {#if topicId != "1"}
           <li>
             <span class="btn-transparent" on:click={() => selectTopicBlock(topicId)}>{title}</span>
             <span class="btn-transparent remove-btn">X</span>
+            <!-- on:click={() => deleteTopic(topicId)} -->
           </li>
+          {/if}
         {/each}
       </ul>
     </div>
