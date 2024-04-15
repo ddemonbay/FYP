@@ -2,6 +2,7 @@
   import { afterUpdate, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { BACKEND_URL, QUIZ_PROMPT, BLOCK_FADE_IN_DELAY, BLOCK_FADE_IN_DURATION, BLOCK_FADE_OUT_DURATION } from "../constants";
+  import LatexInterpreter from "./LatexInterpreter.svelte";
 
   export let username;
   export let topic;
@@ -12,10 +13,9 @@
   export let displayTexts;
   
   let writer;
+  let doneWriting = true;
   let topicBlock;
   let userQueryInput;
-  let script = document.createElement('script');
-  script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
 
   async function sendQuery(query) {
     finalTexts = [...finalTexts, userQueryInput];
@@ -91,6 +91,7 @@
 
   async function getOrGenerateCurriculum(curriculumId, curriculumName) {
     let chatHistory = await getChatHistory(curriculumId);
+    console.log(chatHistory)
     
     if (chatHistory.chatHistory != null) {
       return {
@@ -141,49 +142,33 @@
     }
   }
 
-  function updateLatex() {
-    console.log("update latex")
-    if (document.head.contains(script)) {
-      document.head.removeChild(script);
-    }
-    document.head.append(script);
-    
-    script.onload = () => {
-      MathJax = {
-        tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]},
-        svg: {fontCache: 'global'}
-      };
-    };
-  }
-
   function showText() {
     if (!curriculum) return;
     let lastIndex = displayTexts.length - 1;
     if (finalTexts[lastIndex].length > displayTexts[lastIndex].length) {
       displayTexts[lastIndex] = finalTexts[lastIndex].slice(0, displayTexts[lastIndex].length + 1);
+      doneWriting = false;
       if (displayTexts[displayTexts[lastIndex].length - 1]) {
         setTimeout(showText, 20); // longer pause between words
       } else {
         setTimeout(showText, 5);
       }
     } else {
-      writer = null
+      writer = null;
+      doneWriting = true;
     }
   }
 
   afterUpdate(() => {
     if (!writer) {
       writer = setTimeout(showText, 100);
-    } 
-    updateLatex();
+    }
   })
 
   onMount(() => {
     if (!writer) {
       writer = setTimeout(showText, 500);
     }
-
-    updateLatex();
   })
 </script>
 
@@ -200,9 +185,19 @@
     >
       {#if curriculum}
         <h2 class="title">{curriculum.curriculumName}</h2>
+        <!-- <div>
+          <input bind:value={text}>
+        </div> -->
+        
         {#each displayTexts as displayText, i}
           {#if i % 2 == 0}
-            <p>{@html displayText}</p>
+            {#if doneWriting}
+              {#key displayText}
+              <LatexInterpreter text={displayText}></LatexInterpreter>
+              {/key}
+            {:else}
+              <p>{@html displayText}</p>
+            {/if}
           {:else if !displayText.includes(QUIZ_PROMPT)}
             <p class="color-accent-2">{displayText}</p>
           {/if}

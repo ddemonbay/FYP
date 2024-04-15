@@ -93,7 +93,7 @@
 
     let getPrerequisitesData = await getPrerequisitesResponse.json();
     if (getPrerequisitesData == "Error") {
-      if (recursiveGetPrerequisitesDataCounter == 12) { // timeout - probably actual error in backend instead of processing
+      if (recursiveGetPrerequisitesDataCounter == 20) { // timeout - probably actual error in backend instead of processing
         recursiveGetPrerequisitesDataCounter = 0;
         return getPrerequisitesData;
       }
@@ -120,7 +120,7 @@
 
     let getCurriculumData = await getCurriculumResponse.json();
     if (getCurriculumData == "Error") {
-      if (recursiveGetCurriculumDataCounter == 12) { // timeout - probably actual error in backend instead of processing
+      if (recursiveGetCurriculumDataCounter == 30) { // timeout - probably actual error in backend instead of processing
         recursiveGetCurriculumDataCounter = 0;
         return getCurriculumData;
       }
