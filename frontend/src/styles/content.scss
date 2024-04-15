@@ -121,9 +121,16 @@
 
 .loading-screen {
   display: flex;
+  flex-direction: column;
   height: 50vh;
   justify-content: center;
   align-items: center;
+
+  .fun-fact {
+    font-size: .8em;
+    text-align: center;
+    width: 70%;
+  }
 
   .loading-dot-1 {
     font-size: 1.7em;

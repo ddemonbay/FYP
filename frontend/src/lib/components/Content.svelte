@@ -20,6 +20,7 @@
   let topic;
   let topicIdPair;
   let topicInput = "";
+  let funFact = "";
 
   // preserve nav hist
   const navToBlock = (name) => {
@@ -64,8 +65,23 @@
     }
   }
 
+  async function changeFunFact(topic) {
+    console.log("change fun facts");
+    let getFunFactResponse = await fetch(BACKEND_URL + "/getFunFact", {
+      method: "POST",
+      body: JSON.stringify({
+        topic: topic,
+      }),
+      headers: {
+        "authorizationUserLoginToken": "qwertyuiop:" + username,
+      }
+    });
+    funFact = await getFunFactResponse.json();
+  }
+
   async function selectTopicBlock(selectedTopicId) {
     navToBlock("loading");
+    changeFunFact(topicIdPair[selectedTopicId]);
     topic = await getTopic(selectedTopicId);
     curriculum = null;
     curriculumHist = null;
@@ -165,6 +181,7 @@
   async function searchTopic() {
     navToBlock("loading");
 
+    changeFunFact(topicInput);
     let topicId;
     let generateTopicResponse = await fetch(BACKEND_URL + "/generateTopic", {
       method: "POST",
@@ -320,6 +337,7 @@
         <span class="loading-dot-2">.</span>
         <span class="loading-dot-3">.</span>
       </div>
+      <div class="fun-fact" in:fade={{ delay: 5000, duration: 1000 }}>{funFact}</div>
     </div>
   </div>
   {/if}
