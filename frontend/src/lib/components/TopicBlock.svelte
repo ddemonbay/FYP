@@ -20,17 +20,15 @@
   let userQueryInput;
 
   async function sendQuery(query) {
-    finalTexts = [...finalTexts, userQueryInput];
-    displayTexts = [...displayTexts, userQueryInput];
-    let userQuery = userQueryInput;
-    userQueryInput = "";
+    finalTexts = [...finalTexts, query];
+    displayTexts = [...displayTexts, query];
 
     let sendGptMsgResponse = await fetch(BACKEND_URL + "/sendGptMsg", {
       method: "POST",
       body: JSON.stringify({
         "topicId":  topic.topicId,
         "courseNumber": curriculum.curriculumId,
-        "newMsg": userQuery,
+        "newMsg": query,
       }),
       headers: {
         "authorizationUserLoginToken": "qwertyuiop:" + username,
@@ -196,13 +194,15 @@
           {#if i % 2 == 0}
             {#if doneWriting}
               {#key displayText}
-              <LatexInterpreter text={displayText}></LatexInterpreter>
+              <LatexInterpreter {sendQuery} text={displayText}></LatexInterpreter>
               {/key}
             {:else}
               <p>{@html displayText}</p>
             {/if}
           {:else if !displayText.includes(QUIZ_PROMPT)}
             <p class="color-accent-2">{displayText}</p>
+          {:else if displayText.includes(QUIZ_PROMPT)}
+            <p class="color-accent-2">{"QUIZ TIME"}</p>
           {/if}
         {/each}
         <button
@@ -239,7 +239,7 @@
     {#if curriculum}
       <div class="text-bar">
         <input type="text" bind:value={userQueryInput} placeholder="Ask anything about the topic.." />
-        <div class="go-btn" on:click={() => sendQuery()}>{">"}</div>
+        <div class="go-btn" on:click={() => {sendQuery(userQueryInput); userQueryInput = ""}}>{">"}</div>
       </div>
     {/if}
     
