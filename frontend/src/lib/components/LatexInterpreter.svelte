@@ -14,7 +14,6 @@
         svg: {fontCache: 'global'}
       };
 		};
-		console.log("update Latex")
 	});
 </script>
 

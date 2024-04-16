@@ -1,6 +1,6 @@
 <script>
-  import { slide, fly, fade } from 'svelte/transition';
-  import { afterUpdate, onMount } from 'svelte';
+  import { fly, fade } from 'svelte/transition';
+  import { afterUpdate } from 'svelte';
   import TopicBlock from "./TopicBlock.svelte";
   import { LOGIN_FLY_IN_DURATION, LOGIN_FLY_OUT_DURATION, GET_STARTED_FADE_IN_DURATION, BLOCK_FADE_OUT_DURATION, BLOCK_FADE_IN_DELAY, BLOCK_FADE_IN_DURATION, BACKEND_URL } from '../constants';
 
@@ -66,7 +66,6 @@
   }
 
   async function changeFunFact(topic) {
-    console.log("change fun facts");
     let getFunFactResponse = await fetch(BACKEND_URL + "/getFunFact", {
       method: "POST",
       body: JSON.stringify({
@@ -115,7 +114,7 @@
       }
       await delay(4000);
       recursiveGetPrerequisitesDataCounter ++;
-      console.log("waiting prerequisite data");
+      console.log("recursively getting prerequisite data");
       getPrerequisitesData = await recursiveGetPrerequisitesData(topicId);
     }
     return getPrerequisitesData;
@@ -142,8 +141,7 @@
       }
       await delay(4000);
       recursiveGetCurriculumDataCounter ++;
-      console.log()
-      console.log("waiting curriculum data");
+      console.log("recursively getting curriculum data");
       getCurriculumData = await recursiveGetCurriculumData(topicId);
     }
     return getCurriculumData;
@@ -163,12 +161,6 @@
     if (getCurriculumData == "Error") {
       getCurriculumData = {"curriculum": {}}
     }
-    console.log({
-      "topicId": topicId,
-      "title": topicIdPair[topicId],
-      "prerequisites": getPrerequisitesData["prerequisites"],
-      "curriculum": getCurriculumData["curriculum"],
-    })
 
     return {
       "topicId": topicId,

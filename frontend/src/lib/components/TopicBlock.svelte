@@ -1,6 +1,6 @@
 <script>
   import { afterUpdate, onMount } from "svelte";
-  import { fade, fly } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import { BACKEND_URL, QUIZ_PROMPT, BLOCK_FADE_IN_DELAY, BLOCK_FADE_IN_DURATION, BLOCK_FADE_OUT_DURATION } from "../constants";
   import LatexInterpreter from "./LatexInterpreter.svelte";
 
@@ -70,7 +70,7 @@
   }
 
   async function recursiveGetLatestMsg(curriculumId) {
-    console.log("getting latest msg recursively")
+    console.log("recursively getting latest msg")
     let chatHistory = await getChatHistory(curriculumId);
     
     if (chatHistory.chatHistory.length == finalTexts.length - 1) {
@@ -81,7 +81,7 @@
   }
 
   async function recursiveGetChatHistory(curriculumId) {
-    console.log("getting ChatHistory recursively")
+    console.log("recursively getting ChatHistory")
     let chatHistory = await getChatHistory(curriculumId);
     
     if (chatHistory == "NoHistory") {
@@ -93,7 +93,6 @@
 
   async function getOrGenerateCurriculum(curriculumId, curriculumName) {
     let chatHistory = await getChatHistory(curriculumId);
-    console.log(chatHistory)
     
     if (chatHistory.chatHistory != null) {
       return {
