@@ -194,7 +194,7 @@
           {#if i % 2 == 0}
             {#if doneWriting}
               {#key displayText}
-              <LatexInterpreter {sendQuery} text={displayText}></LatexInterpreter>
+              <LatexInterpreter text={displayText}></LatexInterpreter>
               {/key}
             {:else}
               <p>{@html displayText}</p>
