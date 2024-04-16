@@ -26,6 +26,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow: none;
+  color: rgba(255, 255, 255, 0.94);
 }
 
 #app {

@@ -4,9 +4,16 @@
   color: $color-accent-2;
 }
 
+.dark {
+  .color-accent-2 {
+    color: $color-accent-3;
+  }
+}
+
 .btn-underline {
   cursor: pointer;
   // font-family: "barlow condensed";
+  color: rgba(255, 255, 255, 0.94);
   background-color: transparent;
   border: none;
   padding-left: 0;
@@ -51,6 +58,10 @@
   backdrop-filter: blur( $glass-blur );
   -webkit-backdrop-filter: blur( $glass-blur );
   border: 1px solid rgba( 255, 255, 255, $light-glass-border-opacity );
+
+  input[type="text"], input[type="password"] {
+    background: rgba(#fff, .15); // reduce the stacking color
+  }
 }
 
 .text-bar {
@@ -87,7 +98,7 @@ input[type="text"], input[type="password"] {
   background: rgba(white, $light-glass-opacity);
   
   &::placeholder {
-    color: rgba(white, .5);
+    color: rgba($color-accent-1, .5);
     font-size: .85em;
   }
 
@@ -101,8 +112,8 @@ input[type="text"], input[type="password"] {
     background: rgba( #000, 0.23 );
     box-shadow: 0 8px 32px 0 rgba(#000, $dark-glass-shadow-opacity);
 
-    input[type="text"], input[type="password"] { // reduce the stacking color
-      background: rgba(#000, .08);
+    input[type="text"], input[type="password"] {
+      background: none; // reduce the stacking color
     }
   }
 
@@ -113,7 +124,7 @@ input[type="text"], input[type="password"] {
     background: rgba(#000, $dark-glass-opacity);
     
     &::placeholder {
-      color: rgba(#000, .5);
+      color: rgba(white, .6);
       font-size: .85em;
     }
   
