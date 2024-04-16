@@ -14,10 +14,10 @@
   export let displayTexts;
   export let changeFunFact;
   
-  let writer;
-  let doneWriting = true;
+  let writer = false;
   let topicBlock;
   let userQueryInput;
+  let forceUpdateKey = false;
 
   async function sendQuery(query) {
     finalTexts = [...finalTexts, query];
@@ -145,30 +145,33 @@
 
   function showText() {
     if (!curriculum) return;
+
     let lastIndex = displayTexts.length - 1;
     if (finalTexts[lastIndex].length > displayTexts[lastIndex].length) {
       displayTexts[lastIndex] = finalTexts[lastIndex].slice(0, displayTexts[lastIndex].length + 1);
-      doneWriting = false;
-      if (displayTexts[displayTexts[lastIndex].length - 1]) {
-        setTimeout(showText, 20); // longer pause between words
+      
+      if (displayTexts[lastIndex][displayTexts[lastIndex].length - 1]) {
+        setTimeout(showText, 5); // longer pause between words
       } else {
-        setTimeout(showText, 5);
+        setTimeout(showText, 2);
       }
     } else {
-      writer = null;
-      doneWriting = true;
+      writer = false;
     }
   }
 
   afterUpdate(() => {
-    if (!writer) {
-      writer = setTimeout(showText, 100);
+    if (curriculum && finalTexts[finalTexts.length-1].length > displayTexts[displayTexts.length-1].length && !writer) {
+      writer = true;
+      forceUpdateKey = false;
+      setTimeout(showText, 1500);
     }
-  })
 
-  onMount(() => {
-    if (!writer) {
-      writer = setTimeout(showText, 500);
+    if (curriculum && !writer && !forceUpdateKey) {
+      setTimeout(() => {
+        forceUpdateKey = true;
+        console.log("force")
+      },1000)
     }
   })
 </script>
@@ -186,25 +189,33 @@
     >
       {#if curriculum}
         <h2 class="title">{curriculum.curriculumName}</h2>
-        <!-- <div>
-          <input bind:value={text}>
-        </div> -->
-        
-        {#each displayTexts as displayText, i}
-          {#if i % 2 == 0}
-            {#if doneWriting}
-              {#key displayText}
-              <LatexInterpreter text={displayText}></LatexInterpreter>
-              {/key}
+
+        {#if !writer}
+          {#key forceUpdateKey}
+          <LatexInterpreter>
+            {#each displayTexts as displayText, i}
+              {#if i % 2 == 0}
+                {@html displayText}
+              {:else if displayText.includes(QUIZ_PROMPT)}
+                <p class="color-accent-2">{"QUIZ TIME"}</p>
+              {:else}
+                <p class="color-accent-2">{displayText}</p>
+              {/if}
+            {/each}
+          </LatexInterpreter>
+          {/key}
+        {:else}
+          {#each displayTexts as displayText, i}
+            {#if i % 2 == 0}
+              {@html displayText}
+            {:else if displayText.includes(QUIZ_PROMPT)}
+              <p class="color-accent-2">{"QUIZ TIME"}</p>
             {:else}
-              <p>{@html displayText}</p>
+              <p class="color-accent-2">{displayText}</p>
             {/if}
-          {:else if !displayText.includes(QUIZ_PROMPT)}
-            <p class="color-accent-2">{displayText}</p>
-          {:else if displayText.includes(QUIZ_PROMPT)}
-            <p class="color-accent-2">{"QUIZ TIME"}</p>
-          {/if}
-        {/each}
+          {/each}
+        {/if}
+
         <button
           class="btn-underline quiz-button"
           on:click={() => sendQuery(QUIZ_PROMPT)}
