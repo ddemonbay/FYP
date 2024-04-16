@@ -2,7 +2,6 @@
 
   import { fade } from 'svelte/transition';
   import { GET_STARTED_FADE_IN_DURATION } from '../constants';
-  import TopicBlock from './TopicBlock.svelte';
 
   export let block;
   export let forwardStack;

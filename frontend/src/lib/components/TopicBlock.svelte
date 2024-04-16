@@ -7,6 +7,7 @@
   export let username;
   export let topic;
   export let curriculum;
+  export let curriculumHist;
   export let theme;
   export let block;
   export let finalTexts;
@@ -128,6 +129,7 @@
   async function changeTopic(curriculumId, curriculumName) {
     block = "loading";
     changeFunFact(curriculumName)
+    curriculumHist = null;
 
     curriculum = await getOrGenerateCurriculum(curriculumId, curriculumName);
 

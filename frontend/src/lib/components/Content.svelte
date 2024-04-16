@@ -180,6 +180,8 @@
 
   async function searchTopic() {
     navToBlock("loading");
+    curriculum = null;
+    curriculumHist= null;
 
     changeFunFact(topicInput);
     let topicId;
@@ -341,6 +343,7 @@
         changeFunFact = {changeFunFact}
         bind:username
         bind:topic
+        bind:curriculumHist
         bind:curriculum
         bind:theme
         bind:block
