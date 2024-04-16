@@ -81,25 +81,47 @@
 .action-block {
   width: 38%;
   text-align: center;
+}
 
+.search-block {
   .choice-container {
-    display: flex;
-    justify-content: center;
-  
-    & > * + * {
-      margin-left: 1em;
-    }
+    justify-content: start;
+    width: 27em;
 
     .card {
-      padding: 1em;
-      cursor: pointer;
-      transition: .4s;
-    
-      &:hover {
-        background: rgba( 255, 255, 255, 0.13 );
-        color: rgba( 255, 255, 255, 0.74 );
-      }
+      text-align: center;
+      width: 20vh;
     }
+  }
+}
+
+.choice-container {
+  display: flex;
+  justify-content: center;
+
+  & > * + * {
+    margin-left: 1em;
+  }
+}
+
+.card {
+  padding: 1em;
+  cursor: pointer;
+  transition: .4s;
+
+  &:hover {
+    background: rgba( 255, 255, 255, 0.13 );
+    color: rgba( 255, 255, 255, 0.74 );
+  }
+}
+
+.selected.card {
+  background-color: rgba( black, 0.24 );
+}
+
+.dark {
+  .selected.card {
+    background-color: rgba( white, 0.1 );
   }
 }
 

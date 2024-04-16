@@ -21,6 +21,7 @@
   let topicIdPair;
   let topicInput = "";
   let funFact = "";
+  let level = "basic";
 
   // preserve nav hist
   const navToBlock = (name) => {
@@ -181,6 +182,7 @@
       method: "POST",
       body: JSON.stringify({
         topic: topicInput,
+        topicLevel: level,
       }),
       headers: {
         "authorizationUserLoginToken": "qwertyuiop:" + username,
@@ -303,8 +305,31 @@
   {/if}
 
   {#if block == "topic-search"}
-    <div class="block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
+    <div class="block search-block" in:fade={{ delay: BLOCK_FADE_IN_DELAY, duration: BLOCK_FADE_IN_DURATION }} out:fade={{ duration: BLOCK_FADE_OUT_DURATION }}>
       <p>{displayText}</p>
+      <div class="choice-container">
+        <div
+          class="glass-container card"
+          class:selected={level == "none"}
+          on:click={() => level = "none"}
+        >
+          I know nothing about the topic
+        </div>
+        <div
+          class="glass-container card"
+          class:selected={level == "basic"}
+          on:click={() => level = "basic"}
+        >
+          I have some basic knowledge
+        </div>
+        <div
+          class="glass-container card"
+          class:selected={level == "advanced"}
+          on:click={() => level = "advanced"}
+        >
+          I want to dive deep on the topic
+        </div>
+      </div>
       <div class="text-bar">
         <input type="text" bind:value={topicInput} placeholder="Search a topic you want to learn.." />
         <div class="go-btn" on:click={() => searchTopic()}>{">"}</div>
